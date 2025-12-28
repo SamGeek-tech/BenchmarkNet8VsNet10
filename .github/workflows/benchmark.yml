@@ -25,7 +25,7 @@ jobs:
         include-prerelease: true
 
     - name: Restore Dependencies
-      run: dotnet restore
+      run: dotnet restore Benchmark.sln
 
     - name: Run Benchmarks
       run: .\run-all-benchmarks.ps1 -SkipBaseline -SkipEfCore # Skipping long running for CI demo
