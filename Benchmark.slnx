@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Net10/">
+    <Project Path="BenchmarkApi10/BenchmarkApi10.csproj" />
+    <Project Path="BenchmarkDotNet10/.NET10.Benchmarks/.NET10.Benchmarks.csproj" />
+    <Project Path="BenchmarkDotNet10/.NET10.EfCoreBenchmarks/.NET10.EfCoreBenchmarks.csproj" />
+  </Folder>
+  <Folder Name="/Net8/">
+    <Project Path="BenchmarkApi8/BenchmarkApi8.csproj" />
+    <Project Path="BenchmarkDotNet8/.NET8.Benchmarks/.NET8.Benchmarks.csproj" />
+    <Project Path="BenchmarkDotNet8/.NET8.EfCoreBenchmarks/.NET8.EfCoreBenchmarks.csproj" />
+  </Folder>
+  <Project Path="ApiBenchmark/ApiBenchmark.csproj" />
+</Solution>

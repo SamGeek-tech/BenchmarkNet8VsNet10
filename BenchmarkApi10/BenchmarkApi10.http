@@ -1,0 +1,6 @@
+@BenchmarkApi10_HostAddress = http://localhost:5010
+
+GET {{BenchmarkApi10_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

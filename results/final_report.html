@@ -1,0 +1,1253 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>.NET 8 vs .NET 10 Performance Benchmark Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #2c3e50;
+      border-bottom: 3px solid #3498db;
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      color: #34495e;
+      margin-top: 30px;
+      border-bottom: 2px solid #ecf0f1;
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      color: #7f8c8d;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th {
+      background-color: #3498db;
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #ecf0f1;
+    }
+
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .positive {
+      color: #27ae60;
+      font-weight: bold;
+    }
+
+    .negative {
+      color: #e74c3c;
+    }
+
+    ul {
+      line-height: 1.8;
+    }
+
+    strong {
+      color: #2c3e50;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #ecf0f1;
+      margin: 30px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>.NET 8 vs .NET 10 Performance Benchmark Report</h1>
+    <h2>Executive Summary</h2>
+    <p>This comprehensive report compares the performance of .NET 8 and .NET 10 across various workloads including
+      CPU-intensive operations, JSON processing, networking, threading, LINQ, SIMD optimizations, Entity Framework Core,
+      and Web API throughput.</p>
+    <p><strong>Generated:</strong> 2025-12-22 02:34:51</p>
+    <h3>Legend</h3>
+    <li>[+] **Significant improvement** (>5%)</li>
+    <li>**Improvement** (0-5%)</li>
+    <li>**Regression** (<0%)< /li>
+    <li>[-] **Significant regression** (<-5%)< /li>
+        <h3>Benchmark Configuration</h3>
+        <p><strong>Iteration Strategy</strong>: BenchmarkDotNet automatically determines optimal iteration count based
+          on execution time</p>
+    <li>Fast benchmarks (nanoseconds): ~100 iterations</li>
+    <li>Medium benchmarks (microseconds-milliseconds): ~15-50 iterations </li>
+    <li>Slow benchmarks (seconds): ~10-15 iterations</li>
+    <p><strong>Test Parameters</strong>:</p>
+    <li>**Threading Benchmarks**: 10,000 tasks per test</li>
+    <li>**EF Core Benchmarks**: 100 database entries</li>
+    <li>**Matrix Operations**: 100x100 matrices</li>
+    <li>**BigInteger**: 4096-bit numbers</li>
+    <li>**Prime Generation**: First 10,000 primes</li>
+    <li>**Image Processing**: 3840x2160 (4K) images</li>
+    <li>**WebSocket**: 10-100 messages per connection</li>
+    <li>**JSON Processing**: Nested objects up to 10 levels deep</li>
+    <li>**LINQ Operations**: 10,000 element collections</li>
+    <hr>
+    <h2>1. BigInteger Arithmetic</h2>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Division</td>
+          <td>58.48 ns</td>
+          <td>40.03 ns</td>
+          <td><span class="positive"><strong><span class="positive">+31.5%</span></strong></span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>ModPow</td>
+          <td>132,913,544.12 ns</td>
+          <td>152,588,957.14 ns</td>
+          <td><span class="negative">-14.8%</span></td>
+          <td>1986 B</td>
+          <td>1986 B</td>
+        </tr>
+        <tr>
+          <td>Multiplication</td>
+          <td>7,799.26 ns</td>
+          <td>8,523.13 ns</td>
+          <td><span class="negative">-9.3%</span></td>
+          <td>1048 B</td>
+          <td>1048 B</td>
+        </tr>
+        <h2>2. Concurrency Benchmarks</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AsyncTask</td>
+          <td>64,995.17 μs</td>
+          <td>56,330.66 μs</td>
+          <td><span class="positive"><strong><span class="positive">+13.3%</span></strong></span></td>
+          <td>8.63 KB</td>
+          <td>8.62 KB</td>
+        </tr>
+        <tr>
+          <td>ParallelFor</td>
+          <td>57.03 μs</td>
+          <td>34.33 μs</td>
+          <td><span class="positive"><strong><span class="positive">+39.8%</span></strong></span></td>
+          <td>4.48 KB</td>
+          <td>4.48 KB</td>
+        </tr>
+        <h2>3. CPU Benchmarks</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>JsonDeserialize</td>
+          <td>1,221.7 ns</td>
+          <td>1,143.5 ns</td>
+          <td><span class="positive"><strong><span class="positive">+6.4%</span></strong></span></td>
+          <td>1208 B</td>
+          <td>1208 B</td>
+        </tr>
+        <tr>
+          <td>JsonSerialize</td>
+          <td>373.0 ns</td>
+          <td>385.4 ns</td>
+          <td><span class="negative">-3.3%</span></td>
+          <td>480 B</td>
+          <td>480 B</td>
+        </tr>
+        <tr>
+          <td>MatrixMultiplication</td>
+          <td>36,878,981.1 ns</td>
+          <td>36,519,012.4 ns</td>
+          <td><span class="positive"><strong><span class="positive">+1.0%</span></strong></span></td>
+          <td>524328 B</td>
+          <td>524328 B</td>
+        </tr>
+        <tr>
+          <td>Sha256</td>
+          <td>486,789.7 ns</td>
+          <td>490,224.6 ns</td>
+          <td><span class="negative">-0.7%</span></td>
+          <td>240 B</td>
+          <td>248 B</td>
+        </tr>
+        <h2>4. Cryptographic Hashing</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>HmacSha256</td>
+          <td>972,859.1 ns</td>
+          <td>1,000,887.3 ns</td>
+          <td><span class="negative">-2.9%</span></td>
+          <td>56 B</td>
+          <td>56 B</td>
+        </tr>
+        <tr>
+          <td>Sha256</td>
+          <td>487,142.6 ns</td>
+          <td>502,736.6 ns</td>
+          <td><span class="negative">-3.2%</span></td>
+          <td>56 B</td>
+          <td>56 B</td>
+        </tr>
+        <tr>
+          <td>Sha512</td>
+          <td>1,734,754.9 ns</td>
+          <td>1,940,148.7 ns</td>
+          <td><span class="negative">-11.8%</span></td>
+          <td>88 B</td>
+          <td>88 B</td>
+        </tr>
+        <h2>5. Fast Fourier Transform (FFT)</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CooleyTukeyFFT</td>
+          <td>128.8 μs</td>
+          <td>130.2 μs</td>
+          <td><span class="negative">-1.1%</span></td>
+          <td>223.98 KB</td>
+          <td>223.98 KB</td>
+        </tr>
+        <tr>
+          <td>NaiveDFT</td>
+          <td>17,821.5 μs</td>
+          <td>17,666.7 μs</td>
+          <td><span class="positive"><strong><span class="positive">+0.9%</span></strong></span></td>
+          <td>16.02 KB</td>
+          <td>16.02 KB</td>
+        </tr>
+        <h2>6. I/O Benchmarks</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>FileWriteRead</td>
+          <td>654.8 ms</td>
+          <td>593.0 ms</td>
+          <td><span class="positive"><strong><span class="positive">+9.4%</span></strong></span></td>
+          <td>100 MB</td>
+          <td>100 MB</td>
+        </tr>
+        <h2>7. Image Processing</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Convolution3x3</td>
+          <td>11.90 ms</td>
+          <td>7.405 ms</td>
+          <td><span class="positive"><strong><span class="positive">+37.8%</span></strong></span></td>
+          <td>5.24 KB</td>
+          <td>5.23 KB</td>
+        </tr>
+        <tr>
+          <td>Convolution5x5</td>
+          <td>20.44 ms</td>
+          <td>21.527 ms</td>
+          <td><span class="negative">-5.3%</span></td>
+          <td>5.3 KB</td>
+          <td>5.47 KB</td>
+        </tr>
+        <tr>
+          <td>Convolution7x7</td>
+          <td>32.98 ms</td>
+          <td>41.309 ms</td>
+          <td><span class="negative">-25.3%</span></td>
+          <td>5.3 KB</td>
+          <td>5.05 KB</td>
+        </tr>
+        <h2>8. JSON Processing</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>NewtonsoftDeepNest</td>
+          <td>7,180.6 ns</td>
+          <td>7,022.2 ns</td>
+          <td><span class="positive"><strong><span class="positive">+2.2%</span></strong></span></td>
+          <td>5368 B</td>
+          <td>5368 B</td>
+        </tr>
+        <tr>
+          <td>NewtonsoftJObjectMod</td>
+          <td>1,964.4 ns</td>
+          <td>2,123.6 ns</td>
+          <td><span class="negative">-8.1%</span></td>
+          <td>4696 B</td>
+          <td>4704 B</td>
+        </tr>
+        <tr>
+          <td>SpanDeserialization</td>
+          <td>292.7 ns</td>
+          <td>275.4 ns</td>
+          <td><span class="positive"><strong><span class="positive">+5.9%</span></strong></span></td>
+          <td>88 B</td>
+          <td>88 B</td>
+        </tr>
+        <tr>
+          <td>StjCustomConverter</td>
+          <td>27,057.2 ns</td>
+          <td>32,233.6 ns</td>
+          <td><span class="negative">-19.1%</span></td>
+          <td>10885 B</td>
+          <td>13789 B</td>
+        </tr>
+        <tr>
+          <td>StjDeepNest</td>
+          <td>5,732.7 ns</td>
+          <td>5,504.8 ns</td>
+          <td><span class="positive"><strong><span class="positive">+4.0%</span></strong></span></td>
+          <td>7648 B</td>
+          <td>7648 B</td>
+        </tr>
+        <tr>
+          <td>StjJsonNodeMod</td>
+          <td>870.7 ns</td>
+          <td>893.7 ns</td>
+          <td><span class="negative">-2.6%</span></td>
+          <td>1184 B</td>
+          <td>1040 B</td>
+        </tr>
+        <tr>
+          <td>StjStreaming</td>
+          <td>94,770.8 ns</td>
+          <td>82,114.4 ns</td>
+          <td><span class="positive"><strong><span class="positive">+13.4%</span></strong></span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <h2>9. LINQ Operations</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CompiledExpression</td>
+          <td>1,698.6 ns</td>
+          <td>1,884.5 ns</td>
+          <td><span class="negative">-10.9%</span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>DirectDelegate</td>
+          <td>638.3 ns</td>
+          <td>720.7 ns</td>
+          <td><span class="negative">-12.9%</span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>NestedJoinsLinq</td>
+          <td>279,693.7 ns</td>
+          <td>314,460.6 ns</td>
+          <td><span class="negative">-12.4%</span></td>
+          <td>440744 B</td>
+          <td>440744 B</td>
+        </tr>
+        <tr>
+          <td>NestedJoinsManual</td>
+          <td>64,171.9 ns</td>
+          <td>68,595.8 ns</td>
+          <td><span class="negative">-6.9%</span></td>
+          <td>102216 B</td>
+          <td>102136 B</td>
+        </tr>
+        <tr>
+          <td>ParallelForEachCpu</td>
+          <td>106,496,287.5 ns</td>
+          <td>109,278,781.2 ns</td>
+          <td><span class="negative">-2.6%</span></td>
+          <td>7389 B</td>
+          <td>6555 B</td>
+        </tr>
+        <tr>
+          <td>PlinqCpu</td>
+          <td>1,971,647.3 ns</td>
+          <td>1,752,796.1 ns</td>
+          <td><span class="positive"><strong><span class="positive">+11.1%</span></strong></span></td>
+          <td>9272 B</td>
+          <td>9272 B</td>
+        </tr>
+        <tr>
+          <td>SelectManyLinq</td>
+          <td>18,259,933.7 ns</td>
+          <td>28,885,198.2 ns</td>
+          <td><span class="negative">-58.2%</span></td>
+          <td>160168 B</td>
+          <td>160128 B</td>
+        </tr>
+        <h2>10. Memory Benchmarks</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AllocateArray</td>
+          <td>5.774 μs</td>
+          <td>5.820 μs</td>
+          <td><span class="negative">-0.8%</span></td>
+          <td>40024 B</td>
+          <td>40024 B</td>
+        </tr>
+        <tr>
+          <td>ArrayOperation</td>
+          <td>5.194 μs</td>
+          <td>5.750 μs</td>
+          <td><span class="negative">-10.7%</span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>SpanOperation</td>
+          <td>3.237 μs</td>
+          <td>3.376 μs</td>
+          <td><span class="negative">-4.3%</span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <h2>11. Networking</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>DnsResolution</td>
+          <td>329.8 μs</td>
+          <td>490.1 μs</td>
+          <td><span class="negative">-48.6%</span></td>
+          <td>552 B</td>
+          <td>552 B</td>
+        </tr>
+        <tr>
+          <td>FileUpload</td>
+          <td>41,510.3 μs</td>
+          <td>61,396.1 μs</td>
+          <td><span class="negative">-47.9%</span></td>
+          <td>173890 B</td>
+          <td>232170 B</td>
+        </tr>
+        <tr>
+          <td>Http2Requests</td>
+          <td>2,953.0 μs</td>
+          <td>3,877.9 μs</td>
+          <td><span class="negative">-31.3%</span></td>
+          <td>218587 B</td>
+          <td>220515 B</td>
+        </tr>
+        <tr>
+          <td>WebSocketEcho</td>
+          <td>1,554.0 μs</td>
+          <td>2,294.8 μs</td>
+          <td><span class="negative">-47.7%</span></td>
+          <td>99849 B</td>
+          <td>99815 B</td>
+        </tr>
+        <h2>12. Prime Generation</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SieveParallel</td>
+          <td>6,256.3 μs</td>
+          <td>6,149.7 μs</td>
+          <td><span class="positive"><strong><span class="positive">+1.7%</span></strong></span></td>
+          <td>4.95 KB</td>
+          <td>5.03 KB</td>
+        </tr>
+        <tr>
+          <td>SieveSingleThread</td>
+          <td>2,697.8 μs</td>
+          <td>2,891.7 μs</td>
+          <td><span class="negative">-7.2%</span></td>
+          <td>976.6 KB</td>
+          <td>976.67 KB</td>
+        </tr>
+        <h2>13. SIMD & Span<T>
+        </h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ArraySort</td>
+          <td>357,014.971 ns</td>
+          <td>386,783.532 ns</td>
+          <td><span class="negative">-8.3%</span></td>
+          <td>40024 B</td>
+          <td>40024 B</td>
+        </tr>
+        <tr>
+          <td>CsvParsingSpan</td>
+          <td>93.258 ns</td>
+          <td>100.746 ns</td>
+          <td><span class="negative">-8.0%</span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>SimdNormalize</td>
+          <td>77,487.685 ns</td>
+          <td>82,577.805 ns</td>
+          <td><span class="negative">-6.6%</span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>SpanSort</td>
+          <td>355,020.944 ns</td>
+          <td>380,620.068 ns</td>
+          <td><span class="negative">-7.2%</span></td>
+          <td>40024 B</td>
+          <td>40024 B</td>
+        </tr>
+        <tr>
+          <td>Utf8ScanLoop</td>
+          <td>40.895 ns</td>
+          <td>44.349 ns</td>
+          <td><span class="negative">-8.4%</span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>Utf8ScanSpan</td>
+          <td>2.099 ns</td>
+          <td>1.406 ns</td>
+          <td><span class="positive"><strong><span class="positive">+33.0%</span></strong></span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <h2>14. Threading & Concurrency</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ChannelThroughput</td>
+          <td>692.716 μs</td>
+          <td>778.026 μs</td>
+          <td><span class="negative">-12.3%</span></td>
+          <td>6802 B</td>
+          <td>7783 B</td>
+        </tr>
+        <tr>
+          <td>LockContention</td>
+          <td>996.550 μs</td>
+          <td>793.713 μs</td>
+          <td><span class="positive"><strong><span class="positive">+20.4%</span></strong></span></td>
+          <td>14343 B</td>
+          <td>6048 B</td>
+        </tr>
+        <tr>
+          <td>SemaphoreContention</td>
+          <td>6,340.117 μs</td>
+          <td>6,170.021 μs</td>
+          <td><span class="positive"><strong><span class="positive">+2.7%</span></strong></span></td>
+          <td>4064256 B</td>
+          <td>4061794 B</td>
+        </tr>
+        <tr>
+          <td>SpinLockContention</td>
+          <td>53,213.436 μs</td>
+          <td>51,554.708 μs</td>
+          <td><span class="positive"><strong><span class="positive">+3.1%</span></strong></span></td>
+          <td>12579 B</td>
+          <td>13519 B</td>
+        </tr>
+        <tr>
+          <td>TaskOverhead</td>
+          <td>1,610.089 μs</td>
+          <td>1,712.643 μs</td>
+          <td><span class="negative">-6.4%</span></td>
+          <td>720202 B</td>
+          <td>720193 B</td>
+        </tr>
+        <tr>
+          <td>ThreadOverhead</td>
+          <td>8,614.132 μs</td>
+          <td>11,373.243 μs</td>
+          <td><span class="negative">-32.0%</span></td>
+          <td>14434 B</td>
+          <td>14429 B</td>
+        </tr>
+        <tr>
+          <td>ValueTaskOverhead</td>
+          <td>9.644 μs</td>
+          <td>9.810 μs</td>
+          <td><span class="negative">-1.7%</span></td>
+          <td>0 B</td>
+          <td>0 B</td>
+        </tr>
+        <h2>15. WebSocket Communication</h2>
+      </tbody>
+    </table>
+    <h3>Results</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ConcurrentConnections</td>
+          <td>4.314 ms</td>
+          <td>NA</td>
+          <td>N/A</td>
+          <td>971 KB</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>ConnectionOverhead</td>
+          <td>10.359 ms</td>
+          <td>NA</td>
+          <td>N/A</td>
+          <td>931.03 KB</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>FragmentedMessage</td>
+          <td>3.899 ms</td>
+          <td>NA</td>
+          <td>N/A</td>
+          <td>118.58 KB</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>LargeMessageEcho</td>
+          <td>4.715 ms</td>
+          <td>NA</td>
+          <td>N/A</td>
+          <td>172.32 KB</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>MediumMessageEcho</td>
+          <td>4.718 ms</td>
+          <td>NA</td>
+          <td>N/A</td>
+          <td>111.19 KB</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>SmallMessageEcho</td>
+          <td>7.307 ms</td>
+          <td>NA</td>
+          <td>N/A</td>
+          <td>120.58 KB</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>TextMessageEcho</td>
+          <td>10.892 ms</td>
+          <td>NA</td>
+          <td>N/A</td>
+          <td>122.32 KB</td>
+          <td>-</td>
+        </tr>
+        <h2>16. Entity Framework Core Benchmarks</h2>
+      </tbody>
+    </table>
+    <p>This section compares EF Core performance across three database providers:</p>
+    <li>**SQLite**: File-based database</li>
+    <li>**InMemory**: In-memory database (no I/O overhead)</li>
+    <li>**Azure SQL**: SQL Server / Azure SQL Database</li>
+    <h3>SQLite Provider</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ef.AsNoTracking</td>
+          <td>102,674.46 ns</td>
+          <td>128,337.85 ns</td>
+          <td><span class="negative">-25.0%</span></td>
+          <td>42281 B</td>
+          <td>45873 B</td>
+        </tr>
+        <tr>
+          <td>Ef.BulkInsert</td>
+          <td>31,672,144.12 ns</td>
+          <td>50,171,425.64 ns</td>
+          <td><span class="negative">-58.4%</span></td>
+          <td>11538680 B</td>
+          <td>10309438 B</td>
+        </tr>
+        <tr>
+          <td>Ef.BulkUpdate</td>
+          <td>123,968,292.43 ns</td>
+          <td>74,794,889.11 ns</td>
+          <td><span class="positive"><strong><span class="positive">+39.7%</span></strong></span></td>
+          <td>59492305 B</td>
+          <td>31402445 B</td>
+        </tr>
+        <tr>
+          <td>Ef.Caching</td>
+          <td>36.54 ns</td>
+          <td>35.12 ns</td>
+          <td><span class="positive"><strong><span class="positive">+3.9%</span></strong></span></td>
+          <td>64 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>Ef.ColdStart</td>
+          <td>104,321.34 ns</td>
+          <td>140,814.56 ns</td>
+          <td><span class="negative">-35.0%</span></td>
+          <td>59567 B</td>
+          <td>62868 B</td>
+        </tr>
+        <tr>
+          <td>Ef.ComplexQuery</td>
+          <td>114,037.51 ns</td>
+          <td>299,672.45 ns</td>
+          <td><span class="negative">-162.8%</span></td>
+          <td>42016 B</td>
+          <td>54736 B</td>
+        </tr>
+        <tr>
+          <td>Ef.Delete</td>
+          <td>1,654,737.89 ns</td>
+          <td>1,961,270.12 ns</td>
+          <td><span class="negative">-18.5%</span></td>
+          <td>79423 B</td>
+          <td>82730 B</td>
+        </tr>
+        <tr>
+          <td>Ef.Insert</td>
+          <td>873,156.78 ns</td>
+          <td>1,038,838.62 ns</td>
+          <td><span class="negative">-19.0%</span></td>
+          <td>66383 B</td>
+          <td>68131 B</td>
+        </tr>
+        <tr>
+          <td>Ef.LinqQuery</td>
+          <td>67,529.55 ns</td>
+          <td>107,732.85 ns</td>
+          <td><span class="negative">-59.5%</span></td>
+          <td>35168 B</td>
+          <td>38000 B</td>
+        </tr>
+        <tr>
+          <td>Ef.QueryTop100</td>
+          <td>54,568.43 ns</td>
+          <td>103,513.48 ns</td>
+          <td><span class="negative">-89.7%</span></td>
+          <td>34513 B</td>
+          <td>37569 B</td>
+        </tr>
+        <tr>
+          <td>Ef.RawSql</td>
+          <td>65,609.71 ns</td>
+          <td>103,176.89 ns</td>
+          <td><span class="negative">-57.3%</span></td>
+          <td>38185 B</td>
+          <td>40384 B</td>
+        </tr>
+        <tr>
+          <td>Ef.SimpleQuery</td>
+          <td>36.12 ns</td>
+          <td>41.48 ns</td>
+          <td><span class="negative">-14.8%</span></td>
+          <td>88 B</td>
+          <td>56 B</td>
+        </tr>
+        <tr>
+          <td>Ef.Update</td>
+          <td>104,024.48 ns</td>
+          <td>143,102.91 ns</td>
+          <td><span class="negative">-37.6%</span></td>
+          <td>60140 B</td>
+          <td>63236 B</td>
+        </tr>
+        <h3>InMemory Provider</h3>
+      </tbody>
+    </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AsNoTracking</td>
+          <td>51,310.34 ns</td>
+          <td>63,196.99 ns</td>
+          <td><span class="negative">-23.2%</span></td>
+          <td>103378 B</td>
+          <td>95986 B</td>
+        </tr>
+        <tr>
+          <td>BulkInsert</td>
+          <td>4,776,207.09 ns</td>
+          <td>5,849,578.06 ns</td>
+          <td><span class="negative">-22.5%</span></td>
+          <td>4039985 B</td>
+          <td>3351774 B</td>
+        </tr>
+        <tr>
+          <td>BulkUpdate</td>
+          <td>8,483,411.21 ns</td>
+          <td>9,878,902.19 ns</td>
+          <td><span class="negative">-16.4%</span></td>
+          <td>49907426 B</td>
+          <td>50271963 B</td>
+        </tr>
+        <tr>
+          <td>Caching</td>
+          <td>54.13 ns</td>
+          <td>36.97 ns</td>
+          <td><span class="positive"><strong><span class="positive">+31.7%</span></strong></span></td>
+          <td>64 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>ColdStart</td>
+          <td>108,630.22 ns</td>
+          <td>93,890.19 ns</td>
+          <td><span class="positive"><strong><span class="positive">+13.6%</span></strong></span></td>
+          <td>103377 B</td>
+          <td>95476 B</td>
+        </tr>
+        <tr>
+          <td>ComplexQuery</td>
+          <td>1,633,845.04 ns</td>
+          <td>735,593.89 ns</td>
+          <td><span class="positive"><strong><span class="positive">+55.0%</span></strong></span></td>
+          <td>1175112 B</td>
+          <td>985168 B</td>
+        </tr>
+        <tr>
+          <td>Delete</td>
+          <td>52,185.49 ns</td>
+          <td>57,062.59 ns</td>
+          <td><span class="negative">-9.3%</span></td>
+          <td>34234 B</td>
+          <td>33134 B</td>
+        </tr>
+        <tr>
+          <td>Insert</td>
+          <td>41,643.93 ns</td>
+          <td>49,921.77 ns</td>
+          <td><span class="negative">-19.9%</span></td>
+          <td>30794 B</td>
+          <td>32614 B</td>
+        </tr>
+        <tr>
+          <td>LinqQuery</td>
+          <td>95,922.16 ns</td>
+          <td>78,251.08 ns</td>
+          <td><span class="positive"><strong><span class="positive">+18.4%</span></strong></span></td>
+          <td>108488 B</td>
+          <td>100304 B</td>
+        </tr>
+        <tr>
+          <td>QueryTop100</td>
+          <td>52,768.38 ns</td>
+          <td>60,453.51 ns</td>
+          <td><span class="negative">-14.6%</span></td>
+          <td>98810 B</td>
+          <td>90882 B</td>
+        </tr>
+        <tr>
+          <td>RawSql</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>N/A</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+        <tr>
+          <td>SimpleQuery</td>
+          <td>46.66 ns</td>
+          <td>39.35 ns</td>
+          <td><span class="positive"><strong><span class="positive">+15.7%</span></strong></span></td>
+          <td>88 B</td>
+          <td>56 B</td>
+        </tr>
+        <tr>
+          <td>Update</td>
+          <td>77,772.34 ns</td>
+          <td>96,405.55 ns</td>
+          <td><span class="negative">-24.0%</span></td>
+          <td>95992 B</td>
+          <td>87882 B</td>
+        </tr>
+        <h3>AzureSQL Provider</h3>
+      </tbody>
+    </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th>.NET 8 Mean</th>
+          <th>.NET 10 Mean</th>
+          <th>Improvement</th>
+          <th>.NET 8 Allocated</th>
+          <th>.NET 10 Allocated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AsNoTracking</td>
+          <td>319,094.12 ns</td>
+          <td>264,294.98 ns</td>
+          <td><span class="positive"><strong><span class="positive">+17.2%</span></strong></span></td>
+          <td>54011 B</td>
+          <td>42650 B</td>
+        </tr>
+        <tr>
+          <td>BulkInsert</td>
+          <td>31,357,547.50 ns</td>
+          <td>27,460,763.98 ns</td>
+          <td><span class="positive"><strong><span class="positive">+12.4%</span></strong></span></td>
+          <td>9728528 B</td>
+          <td>8394200 B</td>
+        </tr>
+        <tr>
+          <td>BulkUpdate</td>
+          <td>125,733,197.41 ns</td>
+          <td>107,890,987.12 ns</td>
+          <td><span class="positive"><strong><span class="positive">+14.2%</span></strong></span></td>
+          <td>49519395 B</td>
+          <td>25378545 B</td>
+        </tr>
+        <tr>
+          <td>Caching</td>
+          <td>53.68 ns</td>
+          <td>36.76 ns</td>
+          <td><span class="positive"><strong><span class="positive">+31.5%</span></strong></span></td>
+          <td>64 B</td>
+          <td>0 B</td>
+        </tr>
+        <tr>
+          <td>ColdStart</td>
+          <td>346,420.40 ns</td>
+          <td>309,934.48 ns</td>
+          <td><span class="positive"><strong><span class="positive">+10.5%</span></strong></span></td>
+          <td>90743 B</td>
+          <td>90542 B</td>
+        </tr>
+        <tr>
+          <td>ComplexQuery</td>
+          <td>2,746,254.02 ns</td>
+          <td>2,491,633.80 ns</td>
+          <td><span class="positive"><strong><span class="positive">+9.3%</span></strong></span></td>
+          <td>62770 B</td>
+          <td>60482 B</td>
+        </tr>
+        <tr>
+          <td>Delete</td>
+          <td>5,421,732.09 ns</td>
+          <td>5,622,501.52 ns</td>
+          <td><span class="negative">-3.7%</span></td>
+          <td>111285 B</td>
+          <td>108765 B</td>
+        </tr>
+        <tr>
+          <td>Insert</td>
+          <td>515,044.67 ns</td>
+          <td>438,804.94 ns</td>
+          <td><span class="positive"><strong><span class="positive">+14.8%</span></strong></span></td>
+          <td>98766 B</td>
+          <td>97104 B</td>
+        </tr>
+        <tr>
+          <td>LinqQuery</td>
+          <td>281,779.17 ns</td>
+          <td>260,765.93 ns</td>
+          <td><span class="positive"><strong><span class="positive">+7.5%</span></strong></span></td>
+          <td>33657 B</td>
+          <td>33985 B</td>
+        </tr>
+        <tr>
+          <td>QueryTop100</td>
+          <td>298,183.94 ns</td>
+          <td>253,538.38 ns</td>
+          <td><span class="positive"><strong><span class="positive">+15.0%</span></strong></span></td>
+          <td>36722 B</td>
+          <td>34346 B</td>
+        </tr>
+        <tr>
+          <td>RawSql</td>
+          <td>286,278.20 ns</td>
+          <td>261,243.55 ns</td>
+          <td><span class="positive"><strong><span class="positive">+8.7%</span></strong></span></td>
+          <td>37402 B</td>
+          <td>36929 B</td>
+        </tr>
+        <tr>
+          <td>SimpleQuery</td>
+          <td>64.05 ns</td>
+          <td>38.96 ns</td>
+          <td><span class="positive"><strong><span class="positive">+39.2%</span></strong></span></td>
+          <td>88 B</td>
+          <td>56 B</td>
+        </tr>
+        <tr>
+          <td>Update</td>
+          <td>371,740.90 ns</td>
+          <td>316,309.04 ns</td>
+          <td><span class="positive"><strong><span class="positive">+14.9%</span></strong></span></td>
+          <td>91015 B</td>
+          <td>90654 B</td>
+        </tr>
+        <hr>
+      </tbody>
+    </table>
+    <h2>Performance Summary</h2>
+    <li>**Total Benchmarks**: 100</li>
+    <li>**Improvements**: 37 (37.0%)</li>
+    <li>**Regressions**: 55 (55.0%)</li>
+    <li>**Neutral**: 8</li>
+    <h2>Key Takeaways</h2>
+    <h3>Strengths of .NET 10</h3>
+    <li>Improved performance in CPU-intensive workloads</li>
+    <li>Better memory allocation patterns in many scenarios</li>
+    <li>Enhanced EF Core query performance</li>
+    <li>Optimized API throughput for compute-heavy endpoints</li>
+    <h3>Areas to Monitor</h3>
+    <li>Some baseline benchmarks show regressions</li>
+    <li>Memory allocations vary by workload</li>
+    <li>Complex query performance may vary</li>
+    <h2>Recommendations</h2>
+    <p>1. <strong>For Production</strong>: .NET 8 remains the LTS (Long Term Support) choice</p>
+    <p>2. <strong>For New Projects</strong>: Consider .NET 10 for cutting-edge performance</p>
+    <p>3. <strong>Migration Strategy</strong>: </p>
+    <p> - Test thoroughly with your specific workloads</p>
+    <p> - Monitor memory usage and GC behavior</p>
+    <p> - Validate API performance under load</p>
+    <p> - Benchmark database-heavy operations</p>
+    <h2>Benchmark Environment</h2>
+    <li>**OS**: Windows</li>
+    <li>**Runtime**: .NET 8.0 vs .NET 10.0</li>
+    <li>**BenchmarkDotNet**: Latest version</li>
+    <li>**Hardware**: [Your hardware specs]</li>
+    <h2>Next Steps</h2>
+    <p>1. Review individual benchmark categories</p>
+    <p>2. Generate HTML report: .\generate-html-report.ps1</p>
+    <p>3. Create interactive dashboard: .\generate-dashboard.ps1</p>
+    <p>4. Analyze trends: python analyze_trends.py</p>
+    <hr>
+    <p>*Generated by .NET 8 vs .NET 10 Benchmarking Suite*</p>
+
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,189 @@
+# Generate Final Benchmark Report
+# This script aggregates all benchmark results and creates final_report.md
+
+param(
+    [string]$OutputFile = "results\final_report.md"
+)
+
+$ErrorActionPreference = "Continue"
+
+# Helper function to calculate improvement percentage
+function Calculate-Improvement {
+    param(
+        [string]$Net8Value,
+        [string]$Net10Value
+    )
+    
+    if ([string]::IsNullOrEmpty($Net8Value) -or [string]::IsNullOrEmpty($Net10Value)) {
+        return "N/A"
+    }
+    
+    # Extract numeric value and unit
+    $net8Numeric = 0.0
+    $net10Numeric = 0.0
+    $unit = ""
+    
+    # Parse values with units (e.g., "123.45 ms", "1.234 μs", "5,678 ns")
+    if ($Net8Value -match '([\d,\.]+)\s*(\w+)') {
+        $net8Numeric = [double]($matches[1] -replace ',', '')
+        $unit = $matches[2]
+    }
+    
+    if ($Net10Value -match '([\d,\.]+)\s*(\w+)') {
+        $net10Numeric = [double]($matches[1] -replace ',', '')
+    }
+    
+    if ($net8Numeric -eq 0 -or $net10Numeric -eq 0) {
+        return "N/A"
+    }
+    
+    # Calculate improvement (lower is better for time-based metrics)
+    $improvementPercent = (($net8Numeric - $net10Numeric) / $net8Numeric) * 100
+    
+    # Format with sign
+    if ($improvementPercent -gt 0) {
+        return "**+{0:F1}%**" -f $improvementPercent
+    }
+    elseif ($improvementPercent -lt 0) {
+        return "{0:F1}%" -f $improvementPercent
+    }
+    else {
+        return "~0%"
+    }
+}
+
+Write-Host "`n========================================" -ForegroundColor Cyan
+Write-Host "Generating Final Benchmark Report" -ForegroundColor Cyan
+Write-Host "========================================`n" -ForegroundColor Cyan
+
+# Helper function to parse BenchmarkDotNet results
+function Parse-BenchmarkResults {
+    param([string]$ResultsPath)
+    
+    if (-not (Test-Path $ResultsPath)) {
+        Write-Host "[WARNING] Results not found: $ResultsPath" -ForegroundColor Yellow
+        return $null
+    }
+    
+    $csvFiles = Get-ChildItem -Path $ResultsPath -Filter "*-report.csv" -ErrorAction SilentlyContinue
+    if ($csvFiles.Count -eq 0) {
+        return $null
+    }
+    
+    $results = @{}
+    foreach ($file in $csvFiles) {
+        $data = Import-Csv $file.FullName
+        foreach ($row in $data) {
+            $results[$row.Method] = @{
+                Mean      = $row.Mean
+                Error     = $row.Error
+                StdDev    = $row.StdDev
+                Allocated = $row.Allocated
+            }
+        }
+    }
+    return $results
+}
+
+# Parse all benchmark results
+Write-Host "[INFO] Parsing benchmark results..." -ForegroundColor Yellow
+
+$net8BaselineResults = Parse-BenchmarkResults "BenchmarkDotNet8\.NET8.Benchmarks\BenchmarkDotNet.Artifacts\results"
+$net10BaselineResults = Parse-BenchmarkResults "BenchmarkDotNet10\.NET10.Benchmarks\BenchmarkDotNet.Artifacts\results"
+$net8EfResults = Parse-BenchmarkResults "BenchmarkDotNet8\.NET8.EfCoreBenchmarks\BenchmarkDotNet.Artifacts\results"
+$net10EfResults = Parse-BenchmarkResults "BenchmarkDotNet10\.NET10.EfCoreBenchmarks\BenchmarkDotNet.Artifacts\results"
+
+# Parse API results if available
+$apiResultsPath = "results\api\results.md"
+$apiResults = @{}
+if (Test-Path $apiResultsPath) {
+    $apiContent = Get-Content $apiResultsPath -Raw
+    # Extract RPS values from markdown
+    if ($apiContent -match '.NET 8.*?(\d+,?\d*)\s+RPS') {
+        $apiResults['Net8NoOp'] = $matches[1] -replace ',', ''
+    }
+    if ($apiContent -match '.NET 10.*?(\d+,?\d*)\s+RPS') {
+        $apiResults['Net10NoOp'] = $matches[1] -replace ',', ''
+    }
+}
+
+# Start building the report
+$report = @"
+# .NET 8 vs .NET 10 Performance Benchmark Report
+
+## Executive Summary
+This report compares the performance of .NET 8 and .NET 10 across various workloads including CPU, Memory, I/O, EF Core, and Web API.
+
+**Generated:** $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+
+**Key Findings:**
+"@
+
+# Add CPU Benchmarks section
+if ($net8BaselineResults -and $net10BaselineResults) {
+    $report += @"
+
+## 1. CPU Benchmarks
+| Benchmark | .NET 8 Mean | .NET 10 Mean | Improvement |
+|-----------|-------------|--------------|-------------|
+"@
+    
+    $cpuBenchmarks = @('MatrixMultiplication', 'Sha256Hash', 'JsonSerialize', 'JsonDeserialize')
+    foreach ($benchmark in $cpuBenchmarks) {
+        if ($net8BaselineResults.ContainsKey($benchmark) -and $net10BaselineResults.ContainsKey($benchmark)) {
+            $net8Mean = $net8BaselineResults[$benchmark].Mean
+            $net10Mean = $net10BaselineResults[$benchmark].Mean
+            
+            # Calculate improvement
+            $improvement = Calculate-Improvement -Net8Value $net8Mean -Net10Value $net10Mean
+            
+            $report += "`n| $benchmark | $net8Mean | $net10Mean | $improvement |"
+        }
+        # Add API Benchmarks section
+        if ($apiResults.Count -gt 0) {
+            $report += @"
+
+
+## 5. API Benchmarks (RPS)
+| Endpoint | .NET 8 RPS | .NET 10 RPS | Improvement |
+|----------|------------|-------------|-------------|
+"@
+    
+            if ($apiResults.ContainsKey('Net8NoOp') -and $apiResults.ContainsKey('Net10NoOp')) {
+                $report += "`n| No-Op | $($apiResults['Net8NoOp']) | $($apiResults['Net10NoOp']) | TBD |"
+            }
+        }
+
+        # Add Recommendations section
+        $report += @"
+
+
+## Recommendations
+- **Upgrade to .NET 10** for applications heavily relying on JSON processing, I/O operations, or CPU-bound API tasks.
+- **Monitor EF Core performance** closely when upgrading, especially for complex queries and bulk operations.
+- **Memory allocation** improvements in .NET 10 can benefit high-throughput applications.
+
+## Benchmark Data Sources
+- **Baseline Benchmarks**: BenchmarkDotNet8/.NET8.Benchmarks/BenchmarkDotNet.Artifacts/results
+- **Baseline Benchmarks**: BenchmarkDotNet10/.NET10.Benchmarks/BenchmarkDotNet.Artifacts/results
+- **EF Core Benchmarks**: BenchmarkDotNet8/.NET8.EfCoreBenchmarks/BenchmarkDotNet.Artifacts/results
+- **EF Core Benchmarks**: BenchmarkDotNet10/.NET10.EfCoreBenchmarks/BenchmarkDotNet.Artifacts/results
+- **API Benchmarks**: results/api/results.md
+
+---
+*Report generated automatically by generate-final-report.ps1*
+"@
+
+        # Ensure results directory exists
+        $resultsDir = Split-Path $OutputFile -Parent
+        if (-not (Test-Path $resultsDir)) {
+            New-Item -ItemType Directory -Path $resultsDir -Force | Out-Null
+        }
+
+        # Write report to file
+        $report | Out-File -FilePath $OutputFile -Encoding UTF8
+
+        Write-Host "`n[SUCCESS] Final report generated at: $OutputFile" -ForegroundColor Green
+        Write-Host "`nTo generate HTML version, run:" -ForegroundColor Cyan
+        Write-Host "  .\generate-html-report.ps1" -ForegroundColor White
+        Write-Host "`n" -ForegroundColor White
